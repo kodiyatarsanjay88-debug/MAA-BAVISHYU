@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7faff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MAA BAVISHYU">
+<title>MAA BAVISHYU • Owner OTP Setup</title>
+<style>
+:root{--navy:#12366b;--blue:#087cf0;--violet:#7047df;--ink:#203653;--muted:#72839b;--line:#e4ebf5;--bg:#f5f9ff}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Noto Sans Gujarati",sans-serif;color:var(--ink);background:radial-gradient(ellipse at 10% 0%,#e9f3ff 0,transparent 38%),radial-gradient(ellipse at 100% 100%,#f0eaff 0,transparent 36%),var(--bg)}
+body{min-height:100dvh;display:grid;place-items:center;padding:22px}.wrap{width:min(100%,480px)}.card{background:rgba(255,255,255,.94);border:1px solid #e8eef8;border-radius:28px;padding:30px 25px;box-shadow:0 22px 70px rgba(34,76,130,.11)}
+.brand{text-align:center;margin-bottom:28px}.logo{width:64px;height:64px;margin:0 auto 12px;border-radius:20px;background:linear-gradient(145deg,#0788f8,#5546df);display:grid;place-items:center;color:white;font-weight:900;font-size:30px;box-shadow:0 10px 24px #287be344}.brand h1{font-size:23px;letter-spacing:.5px;color:var(--navy);margin:0}.brand p{font-size:11px;letter-spacing:3px;color:#91a1b8;margin:6px 0 0}.heading{font-size:24px;font-weight:750;color:#173963;margin:0 0 7px}.sub{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 24px}.field-label{display:block;font-size:13px;font-weight:700;margin:0 0 8px;color:#536982}.field{width:100%;height:54px;border:1px solid #dce6f2;border-radius:16px;padding:0 16px;font-size:16px;color:#203653;background:#fff;outline:none}.field:focus{border-color:#2787ef;box-shadow:0 0 0 4px #1684f015}.btn{width:100%;height:54px;border:0;border-radius:16px;margin-top:17px;color:white;font-weight:750;font-size:15px;background:linear-gradient(100deg,#078cf5,#145ee9);box-shadow:0 9px 20px #087cf02c}.btn:disabled{opacity:.55}.status,.error,.success{margin-top:16px;border-radius:14px;padding:13px 14px;font-size:13px;line-height:1.55;display:none;overflow-wrap:anywhere}.status{display:block;background:#f1f7ff;color:#536982}.error{background:#fff0f2;color:#b83250}.success{background:#effbf5;color:#14744a}.small{font-size:12px;color:#8b9aaf;text-align:center;line-height:1.6;margin:22px 0 0}.hidden{display:none!important}.uidbox{font-size:12px;background:#f5f8fd;border:1px solid var(--line);padding:12px;border-radius:12px;overflow-wrap:anywhere;margin-top:10px;color:#344a68}.copy{border:1px solid #d7e3f3;background:white;color:#175ca8;padding:9px 13px;border-radius:10px;font-weight:700;margin-top:10px}.foot{text-align:center;color:#9aabc0;font-size:11px;margin:16px 0 0}
+</style></head>
+<body><main class="wrap"><section class="card">
+<div class="brand"><div class="logo">B</div><h1>MAA BAVISHYU</h1><p>SECURE CLOUD HISAB</p></div>
+<div id="phoneStep"><h2 class="heading">Owner Login</h2><p class="sub">તમારા રજિસ્ટર્ડ મોબાઇલ નંબર પર OTP મોકલાવો.</p>
+<label class="field-label" for="phone">Mobile Number (country code સાથે)</label><input id="phone" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="+91XXXXXXXXXX" value="+91">
+<div id="recaptcha-container" style="margin-top:14px"></div><button id="send" class="btn">Send OTP</button></div>
+<div id="otpStep" class="hidden"><h2 class="heading">Verify OTP</h2><p id="sentTo" class="sub">તમારા મોબાઇલ પર આવેલ 6 અંકનો OTP દાખલ કરો.</p><label class="field-label" for="otp">6-digit OTP</label><input id="otp" class="field" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP"><button id="verify" class="btn">Verify & Continue</button><button id="back" class="copy">Change mobile number</button></div>
+<div id="error" class="error"></div><div id="success" class="success"></div><div id="uidArea" class="hidden"><div class="uidbox"><b>તમારો Firebase User UID</b><div id="uid"></div></div><button id="copyUid" class="copy">Copy UID</button><p class="small">આ UID નો ઉપયોગ આગળ Single Owner Firestore Rules સેટ કરવા માટે થશે. આ પેજ માત્ર Phone OTP Authentication ચકાસે છે; હિસાબનું Cloud Sync હજી ચાલુ કરેલું નથી.</p></div>
+<p class="small" id="hint">Single-owner access setup • OTP verification</p>
+</section><p class="foot">MAA BAVISHYU · OWNER ACCESS</p></main>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+const firebaseConfig={
+  apiKey:'AIzaSyYBDCD-eqyS5FG5pEjOKXmSryOAfTBdtJK0',
+  authDomain:'maa-bavishyu.firebaseapp.com',
+  projectId:'maa-bavishyu',
+  storageBucket:'maa-bavishyu.firebasestorage.app',
+  messagingSenderId:'76576434271',
+  appId:'1:76576434271:web:ead7d90d117cd2e40413ea'
+};
+const $=id=>document.getElementById(id);let confirmation=null,recaptcha=null,auth;
+function err(e){const c=e?.code||'';if(c.includes('invalid-phone-number'))return 'મોબાઇલ નંબર +91 સાથે સાચો દાખલ કરો.';if(c.includes('too-many-requests'))return 'ઘણા OTP પ્રયાસ થયા છે. થોડા સમય પછી ફરી પ્રયાસ કરો.';if(c.includes('captcha'))return 'reCAPTCHA ચકાસણી થઈ નથી. પેજ refresh કરીને ફરી પ્રયાસ કરો.';if(c.includes('unauthorized-domain'))return 'આ વેબસાઇટનું domain Firebase માં Authorized નથી. Firebase Authentication → Settings → Authorized domains માં domain ઉમેરો.';return e?.message||'પ્રક્રિયા પૂર્ણ થઈ નથી. Firebase સેટિંગ તપાસો.'}
+function showError(s){$('error').textContent=s;$('error').style.display='block'}function clearError(){$('error').style.display='none'}
+try{auth=getAuth(initializeApp(firebaseConfig));onAuthStateChanged(auth,user=>{if(user)showUser(user)})}catch(e){showError(err(e))}
+function showUser(user){$('phoneStep').classList.add('hidden');$('otpStep').classList.add('hidden');$('uidArea').classList.remove('hidden');$('uid').textContent=user.uid;$('success').textContent='OTP verification સફળ થયું. Firebase Authentication માં તમારો user બની ગયો છે.';$('success').style.display='block';$('hint').textContent='Authentication verified • Cloud database security setup pending'}
+$('send').onclick=async()=>{clearError();const phone=$('phone').value.trim().replace(/[\s()-]/g,'');if(!/^\+[1-9]\d{7,14}$/.test(phone)){showError('મોબાઇલ નંબર country code સાથે લખો. ઉદાહરણ: +91XXXXXXXXXX');return}try{$('send').disabled=true;if(recaptcha){recaptcha.clear();recaptcha=null}recaptcha=new RecaptchaVerifier(auth,'recaptcha-container',{size:'normal'});await recaptcha.render();confirmation=await signInWithPhoneNumber(auth,phone,recaptcha);$('phoneStep').classList.add('hidden');$('otpStep').classList.remove('hidden');$('sentTo').textContent='OTP મોકલ્યો છે: '+phone}catch(e){showError(err(e));if(recaptcha){try{recaptcha.clear()}catch(_){}recaptcha=null}}finally{$('send').disabled=false}};
+$('verify').onclick=async()=>{clearError();const code=$('otp').value.trim();if(!/^\d{6}$/.test(code)){showError('6 અંકનો OTP દાખલ કરો.');return}try{$('verify').disabled=true;const result=await confirmation.confirm(code);showUser(result.user)}catch(e){showError(err(e))}finally{$('verify').disabled=false}};
+$('back').onclick=()=>{$('otpStep').classList.add('hidden');$('phoneStep').classList.remove('hidden');clearError()};
+$('copyUid').onclick=async()=>{try{await navigator.clipboard.writeText($('uid').textContent);$('copyUid').textContent='Copied'}catch(e){showError('UID ને લાંબું દબાવીને Copy કરો.')}};
+</script></body></html>
